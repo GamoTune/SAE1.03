@@ -1,6 +1,9 @@
 #!/bin/bash
 
-# Fonction pour ajouter un adhérent
+#Importation des fonctions de tests
+source utils.sh
+
+#Fonction pour ajouter un adhérent
 ajout_adherent() {
     local nom="$1"
     local prenom="$2"
@@ -11,7 +14,15 @@ ajout_adherent() {
 
     local chemin_fichier_membres="membres.csv"
 
-    #Chargement du fichier CSV
+
+    #Vérification des arguments
+    if est_entier_positif "$nom" || est_entier_positif "$prenom" || est_entier_positif "$ville"; then
+        echo "Erreur : Les arguments nom, prenom et ville doivent être des chaînes de caractères." >&2
+        exit 1
+    fi
+
+
+    #Vérification de l'existence du fichier membres.CSV
     if [ ! -f $chemin_fichier_membres ]; then
         echo "Erreur : Le fichier $chemin_fichier_membres n'existe pas." >&2
         exit 1
@@ -64,6 +75,19 @@ ajout_livre() {
 
     local chemain_fichier_livres="livres.csv"
     local chemain_fichier_exemplaires="exemplaires.csv"
+
+
+    #Vérification des arguments
+    if ! est_entier_positif "$nombre_exemplaires"; then
+        echo "Erreur : Le nombre d'exemplaires doit être un entier positif." >&2
+        exit 1
+    fi
+
+    if est_entier_positif "$titre" || est_entier_positif "$auteur"; then
+        echo "Erreur : Les arguments titre et auteur ne peuvent pas être des entiers." >&2
+        exit 1
+    fi
+
 
     #Vérification de l'existence du fichier livres.CSV
     if [ ! -f $chemain_fichier_livres ]; then
