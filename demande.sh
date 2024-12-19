@@ -80,7 +80,7 @@ fi
 echo "Emprunt de l'exemplaire $num_exemplaire du livre $titre_livre par $nom_adherent le $date_emprunt."
 
 # Mise à jour de l'état de l'exemplaire
-sed -i '' "s/$num_livre,$num_exemplaire,oui/$num_livre,$num_exemplaire,non/" "$chemain_fichier_exemplaires"
+sed -i "s/$num_livre,$num_exemplaire,oui/$num_livre,$num_exemplaire,non/" "$chemain_fichier_exemplaires"
 
 # Ajout de l'emprunt dans le fichier emprunts.csv
 echo "$num_livre,$num_exemplaire,$nom_adherent,$date_emprunt" >> emprunts.csv
