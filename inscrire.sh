@@ -83,11 +83,6 @@ ajout_livre() {
         exit 1
     fi
 
-    if est_entier_positif "$titre" || est_entier_positif "$auteur"; then
-        echo "Erreur : Les arguments titre et auteur ne peuvent pas être des entiers." >&2
-        exit 1
-    fi
-
 
     #Vérification de l'existence du fichier livres.CSV
     if [ ! -f $chemain_fichier_livres ]; then

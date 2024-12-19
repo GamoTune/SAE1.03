@@ -1,3 +1,8 @@
+#!/bin/bash
+
+# Importation des fonctions de tests
+source utils.sh
+
 # Vérification de l'usage correct
 if [ $# -ne 2 ]; then
     echo "Usage : $0 nom_adhérent titre_livre" >&2
@@ -65,16 +70,8 @@ if [ "$livre_existe" = false ]; then
 fi
 
 # Recherche d'un exemplaire disponible
-while IFS=',' read -r numero_livre numero_exemplaire, est_dispo; do
-    if [[ "$numero_livre" == "$num_livre" ]]; then
-        if [[ "$est_dispo" == "true" ]]; then
-            exemplaire_disponible=true
-            num_exemplaire=$numero_exemplaire
-        fi
-    fi
-done < "$chemain_fichier_exemplaires"
-
-if [ "$exemplaire_disponible" = false ]; then
+num_exemplaire=$(grep "$num_livre" "$chemain_fichier_exemplaires" | grep "oui" | head -n 1 | cut -d ',' -f 2)
+if ! est_entier_positif "$num_exemplaire"; then
     echo "Erreur : Aucun exemplaire disponible pour le livre $titre_livre."
     exit 2
 fi
@@ -83,4 +80,9 @@ fi
 echo "Emprunt de l'exemplaire $num_exemplaire du livre $titre_livre par $nom_adherent le $date_emprunt."
 
 # Mise à jour de l'état de l'exemplaire
-while 
+sed -i '' "s/$num_livre,$num_exemplaire,oui/$num_livre,$num_exemplaire,non/" "$chemain_fichier_exemplaires"
+
+# Ajout de l'emprunt dans le fichier emprunts.csv
+echo "$num_livre,$num_exemplaire,$nom_adherent,$date_emprunt" >> emprunts.csv
+
+exit 0
