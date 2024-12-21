@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Importation des fonctions de tests
-source utils.sh
+source utils.bash
 
 #Fonction pour ajouter un adhérent
 ajout_adherent() {
@@ -144,7 +144,7 @@ ajout_livre() {
 
 
 
-# Vérification de l'usage correct
+# Vérification du nombre d'arguments
 if [ $# -eq 0 ]; then
     echo "Usage : $0 [-a nom prenom ville] [-l nombre_exemplaire titre auteur]" >&2
     exit 1

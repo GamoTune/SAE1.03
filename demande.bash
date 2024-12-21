@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Importation des fonctions de tests
-source utils.sh
+source utils.bash
 
-# Vérification de l'usage correct
+# Vérification du nombre d'arguments
 if [ $# -ne 2 ]; then
     echo "Usage : $0 nom_adhérent titre_livre" >&2
     exit 1
