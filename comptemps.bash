@@ -1,66 +1,60 @@
 #!/bin/bash
 
 # Importation des fonctions de test
-source utils.sh
-
+source utils.bash
 
 # Vérification du nombre d'arguments
 if [ $# -ne 4 ]; then
-    echo "Usage : $0 jour mois année heures:minutes:secondes" >&2
+    echo "Usage : $0 jour mois année 'date complète (ex: \"21 12 2024 15:30:45\")'" >&2
     exit 4
 fi
 
-# Vérification du type des arguments
+# Vérification du type des arguments jour, mois, année
 if ! est_entier_positif "$1" || ! est_entier_positif "$2" || ! est_entier_positif "$3"; then
     echo "Erreur : Les arguments jour, mois et année doivent être des entiers positifs." >&2
     exit 4
 fi
 
-if [ wc -m "$4" -ne 8 ]; then
-    echo "Erreur : L'argument heures:minutes:secondes doit être au format HH:MM:SS." >&2
+# Vérification de la validité de la première date (jour/mois/année)
+if ! date -d "$3/$2/$1" &>/dev/null; then
+    echo "Erreur : La date (jour/mois/année) n'est pas valide." >&2
     exit 4
 fi
 
-if [ wc -m "$1" -ne 2 ] || [ wc -m "$2" -ne 2 ] || [ wc -m "$3" -ne 4]; then
-    echo "Erreur : Les arguments jour, mois et année doivent être au format JJ, MM et AAAA." >&2
+# Vérification de la date complète
+if ! date -d "$(echo "$DATE_COMPLETE" | awk '{print $3"-"$2"-"$1 " " $4}')" &>/dev/null; then
+    echo "Erreur : La date complète doit être valide et au format 'jour mois année heures:minutes:secondes'." >&2
     exit 4
 fi
+
 
 
 # Déclaration des variables (après controle des arguments)
 jour="$1"
 mois="$2"
 annee="$3"
-heure= cut -d ':' -f 1 "$4"
-minute= cut -d ':' -f 2 "$4"
-seconde= cut -d ':' -f 3 "$4"
+# Décomposition de la date complète
+jourActuel=$(echo "$4" | cut -d ' ' -f 1)
+moisActuel=$(echo "$4" | cut -d ' ' -f 2)
+anneeActuelle=$(echo "$4" | cut -d ' ' -f 3)
 
-if ! est_entier_positif "$heure" || ! est_entier_positif "$minute" || ! est_entier_positif "$seconde"; then
-    echo "Erreur : Les arguments heures, minutes et secondes doivent être des entiers positifs." >&2
-    exit 4
-fi
-
-if [ "$heure" -ge 24 ] || [ "$minute" -ge 60 ] || [ "$seconde" -ge 60 ]; then
-    echo "Erreur : Les arguments heures, minutes et secondes doivent être inférieurs à 24, 60 et 60 respectivement." >&2
-    exit 4
-fi
-
-dateActuelle=$(date '+%Y-%m-%d %H:%M:%S') # Date actuelle au format AAAA-MM-JJ HH:MM:SS
-dateSaisie="$annee-$mois-$jour $heure:$minute:$seconde" # Date saisie au format AAAA-MM-JJ HH:MM:SS
-
-jourActuel= cut -d '-' -f 3 "$dateActuelle"
-moisActuel= cut -d '-' -f 2 "$dateActuelle"
-anneeActuelle= cut -d '-' -f 1 "$dateActuelle"
-
-
-# Vérification de la validité de la date saisie
-if [ date -d "$dateSaisie" 2>/dev/null ]; then
-    echo "Erreur : La date saisie est invalide." >&2
-    exit 4
-fi
 
 # Si la date saisie est postérieure ou égale à la date actuelle
-if [ ]
+if [ "$annee" -gt "$anneeActuelle" ] || ([ "$annee" -eq "$anneeActuelle" ] && [ "$mois" -gt "$moisActuel" ]) || ([ "$annee" -eq "$anneeActuelle" ] && [ "$mois" -eq "$moisActuel" ] && [ "$jour" -gt "$jourActuel" ]); then
+    exit 0
+
+elif [ "$annee" -eq "$anneeActuelle" ] && [ "$mois" -eq "$moisActuel" ] && [ "$jour" -eq "$jourActuel" ]; then
+    exit 0
+fi
+
+# Si la date saisie est antérieure à la date courante de plus d'un an
+if [ "$annee" -lt "$((anneeActuelle - 1))" ] || ([ "$annee" -eq "$((anneeActuelle - 1))" ] && [ "$mois" -lt "$moisActuel" ]) || ([ "$annee" -eq "$((anneeActuelle - 1))" ] && [ "$mois" -eq "$moisActuel" ] && [ "$jour" -lt "$jourActuel" ]); then
+    exit 1
+fi
 
 
-# Si la date saisie est antérieure à la date actuelle de plus d'un an
+# Si la date saisie est antérieure à la date courante de plus d'un mois et moins d'un an
+if [ "$annee" -eq "$anneeActuelle" ] && [ "$mois" -lt "$moisActuel" ] && [ "$mois" -ge "$((moisActuel - 12))" ]; then
+    echo "La date saisie est antérieure à la date courante de plus d'un mois et moins d'un an."
+    exit 2
+fi
