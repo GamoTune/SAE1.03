@@ -3,7 +3,6 @@
 # Importation des fonctions de test
 source utils.bash
 
-
 verification_date(){
     # Vérification du nombre d'arguments
     if [ $# -ne 4 ]; then
@@ -18,61 +17,57 @@ verification_date(){
     fi
 
     # Vérification de la validité de la première date (jour/mois/année)
-    if ! date -d "$3/$2/$1" &>/dev/null; then
+    if ! date -d "$3-$2-$1" &>/dev/null; then
         echo "Erreur : La date (jour/mois/année) n'est pas valide." >&2
         exit 4
     fi
 
     # Vérification de la date complète
+    DATE_COMPLETE="$4"
     if ! date -d "$(echo "$DATE_COMPLETE" | awk '{print $3"-"$2"-"$1 " " $4}')" &>/dev/null; then
         echo "Erreur : La date complète doit être valide et au format 'jour mois année heures:minutes:secondes'." >&2
         exit 4
     fi
-}
 
-#date du jour
-date1=$(date +%Y%m%d)
-#date d'emprunt
-date2=$(date --date='2023/11/01' +%Y%m%d)
-echo $date1
-echo $date2
+    # Date d'emprunt (passée en argument)
+    dateEmp=$(date -d "$3-$2-$1" +%Y%m%d)
 
-y1=$(date "+%Y" --date=$date1)
-y2=$(date "+%Y" --date=$date2)
-m1=$(date "+%m" --date=$date1)
-m2=$(date "+%m" --date=$date2)
+    # Date du jour
+    echo $4
+    
+    dateActu=$(date -d "$(echo "$DATE_COMPLETE" | awk '{print $3"-"$2"-"$1 " " $4}')")
 
-echo $y1 $m1 $d1
-echo $y2 $m2 $d2
+    # Extraction des années et des mois pour les calculs
+    anneeActuel=$(date -d "$dateActu" "+%Y")
+    anneeEmprunt=$(date -d "$dateEmp" "+%Y")
+    moisActuel=$(date -d "$dateActu" "+%m")
+    moisEmprunt=$(date -d "$dateEmp" "+%m")
 
-#calcul de la difference entre la date du jour et la date d'emprunt
-# -si la diff est negative, le retour est en retard
-# -si la diff est positive, il reste du temps d'emprunt
-let diff_y=$(expr "$y1-$y2")
+    # Calcul de la différence d'années et de mois
+    diff_annee=$((anneeActuel - anneeEmprunt))
 
-echo $diff_y
-echo $diff_m
+    #Teste si la date d'emprunt est dans le futur
+    if [ "$diff_annee" -lt 0 ]; then
+        exit 1
+    
+    #Teste si la date d'emprunt est dans le passé
+    elif [ "$diff_annee" -gt 0 ]; then
+        diff_mois=$(( (12 - moisEmprunt) + moisActuel + (diff_annee - 1) * 12 ))
+        echo "Le livre a été emprunté il y a $diff_mois mois."
+    else
+        diff_mois=$((moisActuel - moisEmprunt))
 
-if [ "$diff_y" -lt 0 ] #negatif, le livre à été emprunté l'année prochaine : erreur dans les dates
-then
-    exit
-elif [ "$diff_y" -gt 0 ] #positif positif, le livre à été emprunté l'an dernier ou encore plus tard)
-then
-    diff_m=$(( 12-m2+m1+(diff_y-1)*12))
-    echo "le livre à été emprumté il y a $diff_m mois"
+        #Test si le livre a été emprunté dans le future
+        if [ "$diff_mois" -lt 0 ]; then
+            exit 1
 
-elif [ "$diff_y" -eq 0 ] #zero, le livre à été emprunté cette année
-then
-    $diff_m=$m1-$m2
-    if [ "$diff_m" -lt 0 ]
-    then
-        echo "diff_m négatif : le livre à été emprunté le mois prochain : erreur dans les dates"
-        exit
-    elif [ "$diff_m" -eq 0 ]
-    then
-        echo "diff_m=0 : livre à été emprunté ce mois ci"
-    elif [ "$diff_m" -gt 0 ]
-    then
-        echo "diff_m positif : livre à été emprunté il y a $diff_m mois"
+        #Test si le livre a été emprunté ce mois-ci
+        elif [ "$diff_mois" -eq 0 ]; then
+            echo "Le livre a été emprunté ce mois-ci."
+
+        #Test si le livre a été emprunté il y a plus d'un mois
+        else
+            echo "Le livre a été emprunté il y a $diff_mois mois."
+        fi
     fi
-fi
+}

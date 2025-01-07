@@ -21,7 +21,7 @@ exemplaire_disponible=false
 num_exemplaire=0
 
 nom_adherent="$1"
-titre_livre="$2"
+titre_livre=$(convert_text "$2")
 
 date_emprunt=$(date '+%-d %-m %Y %X')
 

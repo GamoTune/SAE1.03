@@ -58,6 +58,7 @@ ajout_adherent() {
     # Ajout dans un fichier CSV
     echo "$((dernier_numero_adherent + 1)),$nom,$prenom,$ville" >> $chemin_fichier_membres
     echo "Adhérent ajouté avec succès dans $chemin_fichier_membres."
+    echo
 }
 
 
@@ -97,8 +98,8 @@ ajout_livre() {
     fi
 
     #Conversion du titre et de l'auteur en minuscules, suppression des espaces et des caractères spéciaux
-    titre=$(echo "$titre" | tr '[:upper:]' '[:lower:]' | tr -d "'" | tr ' ' '_')
-    auteur=$(echo "$auteur" | tr '[:upper:]' '[:lower:]' | tr -d "'" | tr ' ' '_')
+    titre=$(convert_text "$titre")
+    auteur=$(convert_text "$auteur")
 
 
 
@@ -137,6 +138,7 @@ ajout_livre() {
         echo "$numero_livre,$i,oui" >> $chemain_fichier_exemplaires
     done
     echo "Exemplaires ajoutés avec succès dans $chemain_fichier_exemplaires."
+    echo
 }
 
 
@@ -153,32 +155,24 @@ fi
 # Boucle pour traiter les options
 while getopts "a:l:" opt; do
     case $opt in
-        a) 
-            # Vérification qu'il y a exactement 3 arguments après -a
-            if [ $# -lt $((OPTIND + 1)) ]; then
+        a)
+            # Vérification des arguments pour -a
+            if [ $(($OPTIND + 1)) -gt $# ]; then
                 echo "Erreur : L'option -a nécessite exactement 3 arguments : nom, prenom et ville." >&2
                 exit 1
             fi
-
-            # Appel de la fonction avec les arguments
             ajout_adherent "${@:$OPTIND-1:1}" "${@:$OPTIND:1}" "${@:$OPTIND+1:1}"
-
-            # Ajustement d'OPTIND pour sauter les arguments déjà traités
-            OPTIND=$((OPTIND + 3))
+            # Avancer manuellement l'indice pour sauter les arguments de cette option
+            OPTIND=$((OPTIND + 2))
             ;;
         l)
-            # Vérification qu'il y a exactement 3 arguments après -l
-
-            if [ $# -lt $((OPTIND + 1)) ]; then
+            # Vérification des arguments pour -l
+            if [ $(($OPTIND + 1)) -gt $# ]; then
                 echo "Erreur : L'option -l nécessite exactement 3 arguments : nombre_exemplaires, titre et auteur." >&2
                 exit 1
             fi
-
-            # Appel de la fonction avec les arguments
             ajout_livre "${@:$OPTIND-1:1}" "${@:$OPTIND:1}" "${@:$OPTIND+1:1}"
-
-            # Ajustement d'OPTIND pour sauter les arguments déjà traités
-            OPTIND=$((OPTIND + 3))
+            OPTIND=$((OPTIND + 2))
             ;;
         \?)
             echo "Option invalide : -$OPTARG" >&2
