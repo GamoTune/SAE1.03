@@ -51,7 +51,7 @@ while IFS=',' read -r numero fichier_nom fichier_prenom fichier_ville; do
     fi
 done < "$chemin_fichier_membres"
 
-if [ "$adherant_existe" = false ]; then
+if [ "$adherant_existe" = false ]; thenw
     echo "Erreur : $nom_adherent n'est pas inscrit à la bibliothèque."
     exit 2
 fi
