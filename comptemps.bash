@@ -45,31 +45,26 @@ verification_date(){
 
     # Si la date est la même que la date courante
     if [[ $jourEmprunt -eq $jourActuel && $moisEmprunt -eq $moisActuel && $anneeEmprunt -eq $anneeActuel ]]; then
-        # echo "La date saisie est la même que la date courante"
         exit 0
     fi
 
     # Si la date est postérieure à la date courante
-    if [ $anneeEmprunt -gt $anneeActuel ] || [ $anneeEmprunt -eq $anneeActuel -a $moisEmprunt -gt $moisActuel ] || [ $anneeEmprunt -eq $anneeActuel -a $moisEmprunt -eq $moisActuel -a $jourEmprunt -gt $jourActuel ]; then 
-        # echo "La date saisie est postérieure à la date courante"
+    if [ $anneeEmprunt -gt $anneeActuel ] || [ $anneeEmprunt -eq $anneeActuel -a $moisEmprunt -gt $moisActuel ] || [ $anneeEmprunt -eq $anneeActuel -a $moisEmprunt -eq $moisActuel -a $jourEmprunt -gt $jourActuel ]; then
         exit 0
     fi
 
     # Si la date est antérieure à la date courante de plus d'un an
-    if [ $anneeEmprunt -lt $anneeActuel ] && { [ $jourEmprunt -gt $jourActuel ] || [ $moisEmprunt -gt $moisActuel ]; }; then 
-        # echo "La date saisie est antérieure à la date courante de plus d'un an"
+    if [ $anneeEmprunt -lt $anneeActuel ] && { [ $jourEmprunt -gt $jourActuel ] || [ $moisEmprunt -gt $moisActuel ]; }; then
         exit 1
     fi
 
     # Si la date est antérieure à la date courante de plus d'un moisEmprunt mais moins d'un an
     if [[ $anneeEmprunt -eq $anneeActuel && $moisEmprunt -gt $moisActuel ]] || [[ $anneeEmprunt -eq $anneeActuel && $moisEmprunt -eq $moisActuel && $jourEmprunt -gt $jourActuel ]]; then
-        # echo "La date saisie est antérieure de plus de 1 moisEmprunt mais moins d'un an"
         exit 2
     fi
 
     # Si la date est antérieure à la date courante de moins d'un moisEmprunt
-    if [[ $anneeEmprunt -eq $anneeActuel && $moisEmprunt -lt $moisActuel ]] || [[ $anneeEmprunt -eq $anneeActuel && $moisEmprunt -eq $moisActuel && $jourEmprunt -lt $jourActuel ]]; then 
-        # echo "la date saisie est antérieure à la date courante de moins d'un moisEmprunt"
+    if [[ $anneeEmprunt -eq $anneeActuel && $moisEmprunt -lt $moisActuel ]] || [[ $anneeEmprunt -eq $anneeActuel && $moisEmprunt -eq $moisActuel && $jourEmprunt -lt $jourActuel ]]; then
         exit 3
     fi
 
