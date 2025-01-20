@@ -1,7 +1,7 @@
 # SAE1.03
 
 ## Description
-Ce projet est réalisé dans le cadre de la SAE1.03. Il a pour objectif de [décrire l'objectif du projet].
+Ce projet est réalisé dans le cadre de la SAE1.03. Il a pour objectif de proposé une solution de gestion de bibliothéque en bash. Il s'associe à la création d'une VM Debian afin d'utilisé ces scripts.
 
 ## Installation
 1. Clonez le dépôt :
@@ -14,7 +14,7 @@ Ce projet est réalisé dans le cadre de la SAE1.03. Il a pour objectif de [déc
     ```
 
 ## Utilisation
-1. inscrire.bash 
+1. inscrire.bash
     ```bash
     inscrire.bash [-a nom prenom ville] [-l nombre_exemplaire titre auteur]
     ```
